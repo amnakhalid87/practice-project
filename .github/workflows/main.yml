@@ -25,19 +25,17 @@ jobs:
       with:
         context: .
         push: true
-        # Is se image aap ke Docker Hub repo mein chali jaye gi
         tags: ${{ secrets.DOCKER_USERNAME }}/my-ml-app:latest
 
     # ----------------------------------------
     # PART 2: HUGGING FACE AUTOMATION (CD)
     # ----------------------------------------
     - name: Install Hugging Face CLI
-      run: pip install huggingface_hub [1]
+      run: pip install huggingface_hub
 
     - name: Deploy Code to Hugging Face Spaces
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Official CLI login aur code sync command bina kisi URL or slash error ke [1]
-        huggingface-cli login --token $HF_TOKEN --add-to-git-credential [1]
-        huggingface-cli upload_folder amnakhaalid1/my-ml-app . --repo-type=space --commit-message "Deploying professional dockerized ml app" [1]
+        huggingface-cli login --token $HF_TOKEN --add-to-git-credential
+        huggingface-cli upload_folder amnakhaalid1/my-ml-app . --repo-type=space --commit-message "Deploying professional dockerized ml app"
