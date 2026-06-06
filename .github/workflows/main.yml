@@ -18,6 +18,6 @@ jobs:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
         # Hugging Face ke git server par directly code aur Dockerfile push karna
-        # Note: Neeche amnakhaalid87 aur my-ml-app ki jagah apna HF username aur space name match karein
-        git remote add hf https://amnakhaalid87:$HF_TOKEN@huggingface.co/spaces/amnakhaalid87/my-ml-app
+        # Note: Neeche amnakhaalid1 aur my-ml-app ki jagah apna HF username aur space name match karein
+        git remote add hf https://amnakhaalid1:$HF_TOKEN@huggingface.co/spaces/amnakhaalid1/my-ml-app
         git push --force hf main
