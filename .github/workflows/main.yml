@@ -28,17 +28,34 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/my-ml-app:latest
 
     # ----------------------------------------
-    # PART 2: HUGGING FACE NEW CD ENGINE (AUTOMATION)
+    # PART 2: HUGGING FACE DEPLOYMENT (GIT METHOD)
     # ----------------------------------------
-    - name: Install New Hugging Face Hub CLI
-      run: pip install --upgrade huggingface_hub
-
-    - name: Deploy Code via New HF Tool
+    - name: Deploy to Hugging Face Space (Git method)
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Secure login setup
-        hf auth login --token $HF_TOKEN
+        # Clone the Space repo
+        echo "Cloning Hugging Face Space..."
+        git clone https://amnakhaalid1:$HF_TOKEN@huggingface.co/spaces/amnakhaalid1/my-ml-app
         
-        # Exact files update command (Notice the target repository string matching)
-        hf upload amnakhaalid1/my-ml-app . --repo-type=space --commit-message "Production automated deployment via HF Tool from GitHub Actions"
+        # Copy all files (excluding .git and my-ml-app directory)
+        echo "Copying files to Space..."
+        cp -r ./* my-ml-app/ 2>/dev/null || true
+        cp -r ./.[!.]* my-ml-app/ 2>/dev/null || true  # Copy hidden files
+        
+        # Commit and push changes
+        cd my-ml-app
+        git config user.email "github-actions@github.com"
+        git config user.name "GitHub Actions"
+        
+        echo "Adding files to git..."
+        git add .
+        
+        echo "Committing changes..."
+        git commit -m "Production automated deployment from GitHub Actions - $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+        
+        echo "Pushing to Hugging Face Space..."
+        git push
+        
+        echo "✅ Deployment completed successfully!"
+      shell: bash
