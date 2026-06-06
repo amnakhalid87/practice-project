@@ -7,6 +7,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -34,11 +35,11 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Clone the Space repo
+        # Clone the Space repo - CORRECTED USERNAME: amnaakhalid1 (double 'a')
         echo "Cloning Hugging Face Space..."
-        git clone https://amnakhaalid1:$HF_TOKEN@huggingface.co/spaces/amnakhaalid1/my-ml-app
+        git clone https://amnaakhalid1:$HF_TOKEN@huggingface.co/spaces/amnaakhalid1/my-ml-app
         
-        # Copy all files (excluding .git and my-ml-app directory)
+        # Copy all files to Space directory
         echo "Copying files to Space..."
         cp -r ./* my-ml-app/ 2>/dev/null || true
         cp -r ./.[!.]* my-ml-app/ 2>/dev/null || true  # Copy hidden files
@@ -55,7 +56,7 @@ jobs:
         git commit -m "Production automated deployment from GitHub Actions - $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
         
         echo "Pushing to Hugging Face Space..."
-        git push
+        git push origin main
         
         echo "✅ Deployment completed successfully!"
-      shell: bash
+        echo "🔗 Space URL: https://huggingface.co/spaces/amnaakhalid1/my-ml-app"
