@@ -21,7 +21,7 @@ jobs:
         git remote remove hf || true
         
         # Sahi URL bina end-slash ke setup karna
-        git remote add hf https://amnakhaalid1:$HF_TOKEN@huggingface.co/spaces/amnakhaalid1/my-ml-app
+        git remote add hf https://amnakhaalid1:$HF_TOKEN@huggingface.co/spaces/amnakhaalid1/my-ml-app.git
         
         # Branch ko direct cloud par merge aur force push karna
         git push --force hf main:main
