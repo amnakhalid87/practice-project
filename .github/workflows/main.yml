@@ -1,4 +1,4 @@
-name: Complete MLOps Pipeline (Docker Hub & Hugging Face)
+name: Professional MLOps CI/CD Pipeline
 
 on:
   push:
@@ -28,14 +28,17 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/my-ml-app:latest
 
     # ----------------------------------------
-    # PART 2: HUGGING FACE AUTOMATION (CD)
+    # PART 2: HUGGING FACE CLI NEW CD (AUTOMATION)
     # ----------------------------------------
-    - name: Install Hugging Face CLI
-      run: pip install huggingface_hub
+    - name: Install New Hugging Face Hub CLI
+      run: pip install --upgrade huggingface_hub
 
-    - name: Deploy Code to Hugging Face Spaces
+    - name: Deploy Code via HF Tool
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        huggingface-cli login --token $HF_TOKEN --add-to-git-credential
-        huggingface-cli upload_folder amnakhaalid1/my-ml-app . --repo-type=space --commit-message "Deploying professional dockerized ml app"
+        # Naye tool ke mutabik token authenticate karna
+        huggingface-cli login --token $HF_TOKEN
+        
+        # Folder ko direct upload karna (bina git credentials or remote slash issues k)
+        huggingface-cli upload amnakhaalid1/my-ml-app . . --repo-type=space --commit-message "Production automated deployment from GitHub Actions"
