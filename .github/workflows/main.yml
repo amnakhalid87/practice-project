@@ -28,17 +28,15 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/my-ml-app:latest
 
     # ----------------------------------------
-    # PART 2: HUGGING FACE CLI NEW CD (AUTOMATION)
+    # PART 2: HUGGING FACE NEW CD ENGINE (AUTOMATION)
     # ----------------------------------------
     - name: Install New Hugging Face Hub CLI
       run: pip install --upgrade huggingface_hub
 
-    - name: Deploy Code via HF Tool
+    - name: Deploy Code via New HF Tool
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Naye tool ke mutabik token authenticate karna
-        huggingface-cli login --token $HF_TOKEN
-        
-        # Folder ko direct upload karna (bina git credentials or remote slash issues k)
-        huggingface-cli upload amnakhaalid1/my-ml-app . . --repo-type=space --commit-message "Production automated deployment from GitHub Actions"
+        # Naye stable 'hf' core commands se login aur upload sync karna
+        hf auth login --token $HF_TOKEN
+        hf upload amnakhaalid1/my-ml-app . . --repo-type=space --commit-message "Production automated deployment via HF Tool from GitHub Actions"
