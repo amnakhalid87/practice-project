@@ -29,34 +29,31 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/my-ml-app:latest
 
     # ----------------------------------------
-    # PART 2: HUGGING FACE DEPLOYMENT (GIT METHOD)
+    # PART 2: HUGGING FACE DEPLOYMENT - SIMPLE VERSION
     # ----------------------------------------
-    - name: Deploy to Hugging Face Space (Git method)
+    - name: Deploy to Hugging Face Space
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Clone the Space repo - CORRECTED USERNAME: amnaakhalid1 (double 'a')
-        echo "Cloning Hugging Face Space..."
-        git clone https://amnaakhalid1:$HF_TOKEN@huggingface.co/spaces/amnaakhalid1/my-ml-app
+        # Create a temporary directory for HF Space
+        TEMP_DIR=$(mktemp -d)
         
-        # Copy all files to Space directory
-        echo "Copying files to Space..."
-        cp -r ./* my-ml-app/ 2>/dev/null || true
-        cp -r ./.[!.]* my-ml-app/ 2>/dev/null || true  # Copy hidden files
+        # Clone Space to temp directory
+        git clone https://amnaakhalid1:$HF_TOKEN@huggingface.co/spaces/amnaakhalid1/my-ml-app $TEMP_DIR
         
-        # Commit and push changes
-        cd my-ml-app
+        # Copy ALL files from current repo to temp dir (excluding .git)
+        rsync -av --delete --exclude='.git' --exclude='hf_space' --exclude='temp_*' ./ $TEMP_DIR/
+        
+        # Push to Hugging Face
+        cd $TEMP_DIR
         git config user.email "github-actions@github.com"
         git config user.name "GitHub Actions"
-        
-        echo "Adding files to git..."
         git add .
-        
-        echo "Committing changes..."
-        git commit -m "Production automated deployment from GitHub Actions - $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-        
-        echo "Pushing to Hugging Face Space..."
+        git commit -m "Auto-deploy: $(date)" || echo "No changes"
         git push origin main
         
-        echo "✅ Deployment completed successfully!"
-        echo "🔗 Space URL: https://huggingface.co/spaces/amnaakhalid1/my-ml-app"
+        echo "✅ Deployed to Hugging Face Space!"
+        
+        # Cleanup
+        cd /
+        rm -rf $TEMP_DIR
