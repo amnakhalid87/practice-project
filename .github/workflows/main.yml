@@ -37,6 +37,8 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Naye stable 'hf' core commands se login aur upload sync karna
+        # Secure login setup
         hf auth login --token $HF_TOKEN
-        hf upload amnakhaalid1/my-ml-app . . --repo-type=space --commit-message "Production automated deployment via HF Tool from GitHub Actions"
+        
+        # Exact files update command (Notice the target repository string matching)
+        hf upload amnakhaalid1/my-ml-app . --repo-type=space --commit-message "Production automated deployment via HF Tool from GitHub Actions"
