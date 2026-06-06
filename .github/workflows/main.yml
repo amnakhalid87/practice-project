@@ -17,7 +17,12 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Hugging Face ke git server par directly code aur Dockerfile push karna
-        # Note: Neeche amnakhaalid1 aur my-ml-app ki jagah apna HF username aur space name match karein
+        # Purane duplicate remote ko delete karna ta k error na aaye
+        git remote remove hf || true
+        
+        # Sahi URL bina end-slash ke setup karna
         git remote add hf https://amnakhaalid1:$HF_TOKEN@huggingface.co/spaces/amnakhaalid1/my-ml-app
-        git push --force hf main
+        
+        # Branch ko direct cloud par merge aur force push karna
+        git push --force hf main:main
+
