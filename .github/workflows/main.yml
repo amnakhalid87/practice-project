@@ -11,6 +11,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Git LFS aur history ke liye zaroori hai
 
     # ----------------------------------------
     # PART 1: DOCKER HUB AUTOMATION (CI)
@@ -29,26 +31,41 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/my-ml-app:latest
 
     # ----------------------------------------
-    # PART 2: HUGGING FACE DEPLOYMENT
+    # PART 2: MODEL FILE & CONFIG DEPLOY TO HUGGING FACE
     # ----------------------------------------
-    - name: Deploy to Hugging Face Space
+    - name: Deploy Config and Model to Hugging Face
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
         TEMP_DIR=$(mktemp -d)
         
+        # 1. Hugging Face Space repository ko clone karein
         git clone https://amnaakhalid1:$HF_TOKEN@huggingface.co/spaces/amnaakhalid1/my-ml-app $TEMP_DIR
         
-        rsync -av --delete --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' --exclude='model.pkl' ./ $TEMP_DIR/
+        # 2. HF Space ke andar Git LFS (Large File Storage) ko configure karein (Professional Model Handling)
+        cd $TEMP_DIR
+        git lfs install
+        git lfs track "*.pkl"
+        git lfs track "*.h5"
+        git lfs track "*.onnx"
         
+        # 3. GitHub se README.md aur model.pkl ko temporary folder mein copy karein
+        # (Yahan hum code copy nahi kar rahe, kyunki code Docker image mein ja chuka hai)
+        cd $GITHUB_WORKSPACE
+        cp README.md $TEMP_DIR/
+        if [ -f "model.pkl" ]; then cp model.pkl $TEMP_DIR/; fi
+        
+        # 4. Changes ko Hugging Face par push karein
         cd $TEMP_DIR
         git config user.email "github-actions@github.com"
         git config user.name "GitHub Actions"
-        git add .
-        git commit -m "Auto-deploy: $(date)" || echo "No changes"
+        git add README.md .gitattributes
+        if [ -f "model.pkl" ]; then git add model.pkl; fi
+        
+        git commit -m "Pipeline Update: Docker Image Ref & Model Version $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
         git push origin main
         
+        # 5. Clean up
         cd /
         rm -rf $TEMP_DIR
-        
-        echo "✅ Deployed to Hugging Face Space!"
+        echo "✅ Hugging Face triggers deployment from Docker Hub image!"
